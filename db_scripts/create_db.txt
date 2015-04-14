@@ -1,0 +1,25 @@
+create database azvasa;
+use azvasa;
+
+//-------create uses table
+CREATE TABLE `azvasa`.`users` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `user_name` VARCHAR(45) NOT NULL,
+  `password` VARCHAR(20) NOT NULL,
+  PRIMARY KEY (`id`));
+
+ALTER TABLE `azvasa`.`users`
+ADD UNIQUE INDEX `user_name_UNIQUE` (`user_name` ASC);
+
+//-----create stats table
+create table azvasa.stats
+(
+id INT NOT NULL AUTO_INCREMENT,
+vm_name VARCHAR(200) NOT NULL,
+overall_cpu_usage VARCHAR(200) NOT NULL,
+guest_memory_usage VARCHAR(200) NOT NULL,
+host_memory_usage VARCHAR(200) NOT NULL,
+PRIMARY KEY(id)
+);
+

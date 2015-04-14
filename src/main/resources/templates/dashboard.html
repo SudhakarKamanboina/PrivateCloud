@@ -1,0 +1,436 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>Getting Started: Serving Web Content</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet"
+		  th:href="@{/css/kendo.common.min.css}"
+		  href="../css/kendo.common.min.css"/>
+	<link rel="stylesheet"
+		  th:href="@{/css/kendo.bootstrap.min.css}"
+		  href="../css/kendo.bootstrap.min.css"/>
+	<link rel="stylesheet"
+		  th:href="@{/css/kendo.dataviz.min.css}"
+		  href="../css/kendo.dataviz.min.css"/>
+	<link rel="stylesheet"
+		  th:href="@{/css/kendo.dataviz.default.min.css}"
+		  href="../css/kendo.dataviz.default.min.css"/>
+	<link rel="stylesheet"
+		  th:href="@{http://fonts.googleapis.com/css?family=Open+Sans:300,400,700}"
+		  href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700"/>
+	<link rel="stylesheet" media="screen"
+		  th:href="@{/assets/css/font-awesome.min.css}"
+		  href="../assets/css/font-awesome.min.css"/>
+	<link rel="stylesheet"
+		  th:href="@{/assets/css/bootstrap.min.css}"
+		  href="../assets/css/bootstrap.min.css"/>
+	<link rel="stylesheet" media="screen"
+		  th:href="@{/assets/css/bootstrap-theme.css}"
+		  href="../assets/css/bootstrap-theme.css"/>
+	<link rel="stylesheet" media="screen"
+		  th:href="@{/assets/css/main.css}"
+		  href="../assets/css/main.css"/>
+</head>
+<script type="text/javascript" src="../js/jquery.min.js"></script>
+<script type="text/javascript" src="../js/kendo.all.min.js"></script>
+<script src="assets/js/headroom.min.js"></script>
+<script src="assets/js/jQuery.headroom.min.js"></script>
+<script src="assets/js/template.js"></script>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<style>
+	.navbar{background-color: #2980b9 !important;}
+</style>
+<body>
+
+<div class="navbar  navbar-fixed-top headroom" >
+	<div class="container">
+		<div class="navbar-header">
+			<!-- Button for smallest screens -->
+			<h1 style="color: white; margin: 0px 10px 0px 10px;">Team 14 Private-Cloud</h1>
+		</div>
+		<div class="navbar-collapse collapse">
+			<ul class="nav navbar-nav pull-right">
+				<li class="active"><a class="btn btn-default" href="/login">Logout</a></li>
+			</ul>
+		</div><!--/.nav-collapse -->
+	</div>
+</div>
+<div  class="dashbrd" style="margin-top:5%;">
+
+	<div class="col-md-4 col-md-offset-2" style="margin-bottom: 10px">
+		<button id="createVmButton" class="btn btn-primary btn-lg">Create VM</button>
+		<!--<button id="deployVmButton" class="btn btn-primary btn-lg">Deploy VM</button>-->
+	</div>
+	<br/>
+	<div id="example" class="col-md-8 col-md-offset-2">
+		<div id="popupVM">
+			<div id="templateGrid"></div>
+		</div>
+
+		<div id="createvmpopup">
+			<input id="name" type="text" />
+			<select id= "select" name="oslist">
+				<option value="windows">Windows</option>
+				<option value="linux">Linux</option>
+			</select>
+			<button class="btn btn-primary btn-lrg" onclick="submit()">Submit</button>
+		</div>
+
+		<div id="grid"></div>
+
+		<script th:inline="javascript" type="text/x-kendo-template" id="template">
+			<div class="tabstrip">
+				<ul>
+					<li>
+						Vm Statistics
+					</li>
+				</ul>
+				<div class='vm-details'>
+					<ul style="list-style:none;font-style:italic;margin: 15px;padding: 0;">
+						<li style = "margin: 0;line-height: 1.7em;">
+							<label style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">
+								Boot Time:
+							</label>
+							#= bootTime #
+						</li>
+						<!--<li style = "margin: 0;line-height: 1.7em;"><label style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">Guest my:</label>#= guestMemoryUsage #</li>
+						<li style = "margin: 0;line-height: 1.7em;"><label  style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">Host Mmy:</label>#= hostMemoryUsage #</li>
+						<li style = "margin: 0;line-height: 1.7em;"><label  style="display:inline-block;width:90px;padding-right: 10px;text-align: right;font-style:normal;font-weight:bold;">Version:</label>#= version #</li>-->
+						<li style = "margin: 0;line-height: 1.7em;">
+							   <span id="gauge-container">
+	                				<span id="gauge#= name #" style="display:inline-block;">VM Memory Usage</span>
+	                				<span style="display:inline-block;" id="osgauge#= name #">VM CPU Usage</span>
+								</span>
+							   <span id="gauge-label" style= "display:block;">
+	                				<span id="" style="display:inline-block;margin-left:5%;width:17%;">Memory Usage</span>
+	                				<span style="display:inline-block;" id="osgauge">CPU Usage</span>
+								</span>
+						</li>
+						<!-- <li style = "margin: 0;line-height: 1.7em;">
+							   <span id="gauge-container">
+	                				<span id="gauge#= name #" style="display:inline-block;">HostMMy</span>
+	                				<span style="display:inline-block;" id="osgauge#= name #">CPUUsage</span>
+								</span>
+							   <span id="gauge-label" style= "display:block;">
+	                				<span id="" style="display:inline-block;margin-left:5%;width:17%;">HostMemory</span>
+	                				<span style="display:inline-block;" id="osgauge">CPUUsage</span>
+								</span>
+						</li> -->
+					</ul>
+				</div>
+			</div>
+		</script>
+		<script th:inline="javascript">
+			var vmObj ="";
+			var templates={
+				"os":"Windows",
+				"os":"Linux"
+			};
+
+
+
+			$(document).ready(function() {
+				$("#createVmButton").kendoButton();
+				$("#createVmButton").kendoButton();
+				$.ajax({
+					url: "/api/v1/vms",
+					success: function (response) {
+						// Get default value from the server response
+						vmObj=response;
+						console.log(vmObj);
+						createGrid(vmObj);
+					},
+					error: function () {
+						// Stop displaying loading indicator
+						kendo.ui.progress(editEvent.container, false);
+						console.error("uh oh!");
+					}
+				});
+				//createTemplateGrid(templates);
+				var window = $("#createvmpopup"),
+						undo = $("#createVmButton")
+								.bind("click", function() {
+									window.data("kendoWindow").open();
+								});
+				if (!window.data("kendoWindow")) {
+					window.kendoWindow({
+						width: "600px",
+						height:"200px",
+						title: "Create VM",
+						actions: [
+							"Pin",
+							"Minimize",
+							"Maximize",
+							"Close"
+						],
+						visible:false
+					});
+				}
+			});
+
+			function createGrid(vms) {
+				console.log(vms);
+				$("#grid").kendoGrid({
+					dataSource: {
+						data: vms,
+						schema: {
+							model: {
+								fields: {
+									name: { type: "string" },
+									guestOSName: { type: "string" },
+									ip: { type: "string" },
+									powerState: { type: "string" }
+								}
+							}
+						},
+						pageSize: 20
+					},
+					height: 550,
+					scrollable: true,
+					sortable: true,
+					filterable: true,
+//			                dataBinding: onDataBinding,
+					pageable: {
+						input: true,
+						numeric: false
+					},
+					detailTemplate: kendo.template($("#template").html()),
+					detailExpand: detailExpand,
+					columns: [
+						{ field: "name", title: "Name", width: "16%" },
+						{ field: "guestOSName", title: "OS", width: "36%" },
+						//{ field: "ip", title: "IP", width: "16%" },
+						{ field: "powerState", title: "Status", width: "16%", template: "#= showColorText(data) #" },
+						{ command: { text: "Deploy", click: startVM}, title: " ", width: "16%"},
+						{ command: { text: "PowerOff", click: stopVM}, title: " ", width: "16%"}
+					]
+				});
+
+			}
+
+			function detailExpand(e) {
+				console.log(e.detailRow[0].rowIndex);
+				var grid = $("#grid").data("kendoGrid");
+				var rowId = e.detailRow[0].rowIndex
+				var data = grid.dataItem("tr:eq("+rowId+")");
+				var detailRow = e.detailRow;
+				console.log(data.hostMemoryUsage);
+				console.log(data.overallCPUUsage);
+				createGauge(data.hostMemoryUsage, data.name);
+				createOSGauge(data.overallCPUUsage, data.name);
+				detailRow.find(".tabstrip").kendoTabStrip({
+					animation: {
+						open: { effects: "fadeIn" },
+						close: {
+							//duration: 200,
+							effects: "fadeOut"
+						}
+					}
+				});
+			}
+
+			function createTemplateGrid(templates) {
+				console.log(templates);
+				$("#templateGrid").kendoGrid({
+					dataSource: {
+						data: templates,
+						schema: {
+							model: {
+								fields: {
+									os: { type: "string" }
+								}
+							}
+						},
+						pageSize: 20
+					},
+					height: 200,
+					scrollable: true,
+					sortable: true,
+					filterable: true,
+					pageable: {
+						input: true,
+						numeric: false
+					},
+					columns: [
+						{ field: "os", title: "OS", width: "130px", hidden:true },
+						{ command: { text: "Windows", click: createWindowsVM }, title: " ", width: "180px" },
+						{ command: { text: "Linux", click: createLinuxVM}, title: " ", width: "180px" }
+					]
+				});
+			}
+			/*vm new*/
+			function submit(){
+				var name=$("#name").val();
+				var option=$( "#select option:selected" ).text();
+				//alert(name+option);
+				if(option=="Windows"){
+					createWindowsVM(name);
+				 }
+				 else{
+					createLinuxVM(name);
+				 }
+				window.data("kendoWindow").close();
+			}
+			/*vm new end*/
+
+			function createWindowsVM(vmName) {
+				$.ajax({
+					url: "/api/v1/vms/create/windows/"+vmName,
+					success: function (response) {
+						// Get default value from the server response
+						vmObj=response;
+						console.log(vmObj);
+						createGrid(vmObj);
+					},
+					error: function () {
+						// Stop displaying loading indicator
+						kendo.ui.progress(editEvent.container, false);
+						console.error("uh oh!");
+					}
+				});
+			}
+			function createLinuxVM(vmName) {
+				$.ajax({
+					url: "/api/v1/vms/create/linux/"+vmName,
+					success: function (response) {
+						// Get default value from the server response
+						vmObj=response;
+						console.log(vmObj);
+						createGrid(vmObj);
+					},
+					error: function () {
+						// Stop displaying loading indicator
+						kendo.ui.progress(editEvent.container, false);
+						console.error("uh oh!");
+					}
+				});
+			}
+			function startVM(e) {
+				var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+				console.log(dataItem.name);
+				var vmName = dataItem.name;
+				$.ajax({
+					type: "POST",
+					url: "/api/v1/vms/"+vmName+"/on",
+					success: function (response) {
+						// Get default value from the server response
+						console.log(response);
+					},
+					error: function () {
+						// Stop displaying loading indicator
+						kendo.ui.progress(editEvent.container, false);
+						console.error("uh oh!");
+					}
+				});
+			}
+
+			function stopVM(e) {
+				var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+				console.log(dataItem.name);
+				var vmName = dataItem.name;
+				$.ajax({
+					type: "POST",
+					url: "/api/v1/vms/"+vmName+"/off",
+					success: function (response) {
+						// Get default value from the server response
+						console.log(response);
+					},
+					error: function () {
+						// Stop displaying loading indicator
+						kendo.ui.progress(editEvent.container, false);
+						console.error("uh oh!");
+					}
+				});
+			}
+
+
+			function createGauge(hostMemoryUsage, userName) {
+				var free = 100-(hostMemoryUsage/10);
+				free = free.toFixed(2);
+				$("#gauge"+userName).kendoChart({
+					title: {
+						position: "bottom",
+						text: "Memory Usage"
+					},
+					legend: {
+						visible: false
+					},
+					chartArea: {
+						background: ""
+					},
+					seriesDefaults: {
+						labels: {
+							visible: true,
+							background: "transparent",
+							template: "#= category #: \n #= value#%"
+						}
+					},
+					series: [{
+						type: "pie",
+						startAngle: 100,
+						data: [{
+							category: "Used",
+							value: hostMemoryUsage/10,
+							color: "#c20000"
+						},{
+							category: "Free",
+							value: free,
+							color: "#9de219"
+						}]
+					}],
+					tooltip: {
+						visible: true,
+						format: "{0}%"
+					}
+				});
+			}
+			function createOSGauge(overallCPUUsage, userName) {
+
+				var free = Math.abs(100-(overallCPUUsage/10));
+				free = free.toFixed(2);
+				$("#osgauge"+userName).kendoChart({
+					title: {
+						position: "bottom",
+						text: "CPU Usage"
+					},
+					legend: {
+						visible: false
+					},
+					chartArea: {
+						background: ""
+					},
+					seriesDefaults: {
+						labels: {
+							visible: true,
+							background: "transparent",
+							template: "#= category #: \n #= value#%"
+						}
+					},
+					series: [{
+						type: "pie",
+						startAngle: 100,
+						data: [{
+							category: "Used",
+							value: overallCPUUsage/10,
+							color: "#c20000"
+						},{
+							category: "Free",
+							value: free,
+							color: "#9de219"
+						}]
+					}],
+					tooltip: {
+						visible: true,
+						format: "{0}%"
+					}
+				});
+			}
+			function showColorText(data) {
+				if(data.powerState=='poweredOn') return '<span style="color:green;">Running</span>';
+				if(data.powerState=='poweredOff') return '<span style="color:red;">Stopped</span>';
+			}
+		</script>
+	</div>
+</div>
+</body>
+</html>
